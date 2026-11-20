@@ -22,9 +22,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
-      - name: Install dependencies
-        run: npm install --legacy-peer-deps
+      - name: Install dependencies (include platform-native optional packages)
+        run: npm install --legacy-peer-deps --include=optional --package-lock=false
+      - name: Verify Vite native binding
+        run: node -e "require.resolve('@rolldown/binding-win32-x64-msvc')"
       - name: Build web renderer
         run: npm run build
       - name: Package Windows installer and portable app
