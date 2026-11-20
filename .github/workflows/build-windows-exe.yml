@@ -1,0 +1,45 @@
+name: Build Windows Desktop EXE
+
+on:
+  pull_request:
+    branches: [ main, master ]
+  push:
+    branches: [ main, master ]
+    tags: [ 'v*' ]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-windows:
+    name: Build Procura for Windows
+    runs-on: windows-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+      - name: Type-check
+        run: npm run lint
+      - name: Build web renderer
+        run: npm run build
+      - name: Package Windows installer and portable app
+        run: npx electron-builder --win nsis portable --x64
+      - name: Upload Windows EXE artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: Procura-Windows-Desktop
+          path: release/*-x64.exe
+          if-no-files-found: error
+          retention-days: 30
+      - name: Attach EXE files to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release/*-x64.exe
