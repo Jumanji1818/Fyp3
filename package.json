@@ -10,7 +10,10 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "cap:sync": "npx cap sync",
-    "cap:build": "npm run build && npx cap sync android"
+    "cap:build": "npm run build && npx cap sync android",
+    "desktop:dev": "electron .",
+    "desktop:dist": "npm run build && electron-builder --win nsis portable --x64",
+    "desktop:dist:dir": "npm run build && electron-builder --win dir"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.3",
@@ -38,6 +41,32 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2",
-    "vite-plugin-pwa": "^2.0.0"
-  }
+    "vite-plugin-pwa": "^2.0.0",
+    "electron": "^39.2.7",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "ng.procura.desktop",
+    "productName": "Procura",
+    "directories": { "output": "release" },
+    "files": ["dist/**/*", "electron/**/*", "package.json"],
+    "asar": true,
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] }
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Procura"
+    },
+    "portable": { "artifactName": "${productName}-Portable-${version}-${arch}.${ext}" }
+  },
+  "main": "electron/main.cjs"
 }
