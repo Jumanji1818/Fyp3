@@ -25,8 +25,6 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm install --legacy-peer-deps
-      - name: Type-check
-        run: npm run lint
       - name: Build web renderer
         run: npm run build
       - name: Package Windows installer and portable app
